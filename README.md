@@ -8,6 +8,9 @@ dotnet user-secrets init (in project dir)
 dotnet user-secrets set "Authentication:Facebook:AppId" "<app-id>"
 dotnet user-secrets set "Authentication:Facebook:AppSecret" "<app-secret>"
 
+dotnet user-secrets set "Authentication:Google:ClientId" "<client-id>"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "<client-secret>"
+
 Software dependencies
 NetCore
 FFMPEG
