@@ -15,6 +15,24 @@
 @section Scripts
 {
     <script>
+        $(function () {
+            $('#submit').on('click', function (evt) {
+                evt.preventDefault();
+                $.ajax({
+                    url: '',
+                    data: new FormData(document.forms[0]),
+                    contentType: false,
+                    processData: false,
+                    type: 'post',
+                    success: function () {
+                        alert('Uploaded by jQuery');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
         var video = document.getElementById('video');
 
         // Get access to the camera!
@@ -29,27 +47,25 @@
         // Elements for taking the snapshot
         var canvas = document.getElementById('canvas');
         var context = canvas.getContext('2d');
-        var video = document.getElementById('video');
 
-        // Trigger photo take
         document.getElementById("snap").addEventListener("click", function () {
             context.drawImage(video, 0, 0, 640, 480);
         });
 
         $("#btnSave").click(function () {
-
-            var image = document.getElementById("canvas").toDataURL("image/png");
-            image = image.replace('data:image/png;base64,', '');
-
-            $.ajax({
-                type: 'POST',
-                url: "/Home/UploadImage",
-                data: '{ "imageData" : "' + image + '" }',
-                ContentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                success: function (msg) {
-                    alert('Image saved successfully !');
-                }
+            canvas.toBlob(function (blob) {
+                const formData = new FormData();
+                formData.append('UploadedFile', blob, 'UploadedFile.png');
+                $.ajax({
+                    url: '',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    type: 'post',
+                    success: function () {
+                        //alert('Uploaded by jQuery');
+                    }
+                });
             });
         });
 
