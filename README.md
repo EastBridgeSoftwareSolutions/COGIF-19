@@ -11,6 +11,9 @@ dotnet user-secrets set "Authentication:Facebook:AppSecret" "<app-secret>"
 dotnet user-secrets set "Authentication:Google:ClientId" "<client-id>"
 dotnet user-secrets set "Authentication:Google:ClientSecret" "<client-secret>"
 
+dotnet user-secrets set "Authentication:Microsoft:ClientId" "<client-id>"
+dotnet user-secrets set "Authentication:Microsoft:ClientSecret" "<client-secret>"
+
 Software dependencies
 NetCore
 FFMPEG

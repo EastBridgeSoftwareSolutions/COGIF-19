@@ -40,10 +40,14 @@ namespace TimeLapseWebHost
                 .AddGoogle(options =>
                 {
                     IConfigurationSection googleAuthNSection = Configuration.GetSection("Authentication:Google");
-
                     options.ClientId = googleAuthNSection["ClientId"];
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
-                }); ;
+                })
+                .AddMicrosoftAccount(microsoftOptions =>
+                {
+                    microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ClientId"];
+                    microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                });
             services.AddRazorPages();
         }
 
