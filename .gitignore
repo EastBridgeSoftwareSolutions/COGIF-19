@@ -348,4 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-/TimeLapseWebHost/TimeLapseWebHost/Images/c0ee530b-b031-464e-8c4a-0e8834b306ae
+
+/TimeLapseWebHost/TimeLapseWebHost/Images
+
