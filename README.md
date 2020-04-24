@@ -3,13 +3,26 @@ The MyCoronaFace application is all about showing the impact corona has on a per
 
 Getting Started
 Installation process
+Use secret storage
+dotnet user-secrets init (in project dir)
+dotnet user-secrets set "Authentication:Facebook:AppId" "<app-id>"
+dotnet user-secrets set "Authentication:Facebook:AppSecret" "<app-secret>"
+
+dotnet user-secrets set "Authentication:Google:ClientId" "<client-id>"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "<client-secret>"
+
+dotnet user-secrets set "Authentication:Microsoft:ClientId" "<client-id>"
+dotnet user-secrets set "Authentication:Microsoft:ClientSecret" "<client-secret>"
+
 Software dependencies
 NetCore
 FFMPEG
+
 Latest releases
 API references
+
 Build and Test
-TODO: Describe and show how to build your code and run the tests.
+
 
 Contribute
 TODO: Explain how other users and developers can contribute to make your code better.
