@@ -22,7 +22,7 @@ namespace TimeLapseWebHost
 
         public async Task Create(IFormFile uploadedFile, string id)
         {
-            var userpath = Path.Combine(_env.ContentRootPath, imagesRoot, id);
+            string userpath = GetUserFolder(id);
             var filename = DateTime.Now.Ticks + ".png";
             var filePath = Path.Combine(userpath, filename);
             Directory.CreateDirectory(userpath);
@@ -30,6 +30,22 @@ namespace TimeLapseWebHost
             {
                 await uploadedFile.CopyToAsync(stream);
             }
+        }
+
+        public List<string> GetAll(string id)
+        {
+            string userpath = GetUserFolder(id);
+            return Directory.GetFiles(userpath).ToList();
+        }
+
+        public string GetUserFolder(string id)
+        {
+            return Path.Combine(_env.WebRootPath, imagesRoot, id);
+        }
+
+        public string GetFFMPEGFolder()
+        {
+            return Path.Combine(_env.ContentRootPath, "FFMPEG");
         }
     }
 }

@@ -18,11 +18,13 @@ namespace TimeLapseWebHost.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IFileStore _fileStore;
+        private readonly IVideoEngine _videoEngine;
 
-        public IndexModel(ILogger<IndexModel> logger, IFileStore fileStore)
+        public IndexModel(ILogger<IndexModel> logger, IFileStore fileStore, IVideoEngine videoEngine)
         {
             _logger = logger;
             _fileStore = fileStore;
+            _videoEngine = videoEngine;
         }
 
         public void OnGet()
@@ -49,6 +51,7 @@ namespace TimeLapseWebHost.Pages
             }
             //bewust niet awaiten? laat maar gaan
             await _fileStore.Create(UploadedFile, id);
+            _videoEngine.Create(id);
 
             return RedirectToPage("/Index");
         }

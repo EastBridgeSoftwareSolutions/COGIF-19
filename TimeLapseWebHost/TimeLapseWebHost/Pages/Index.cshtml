@@ -1,16 +1,22 @@
 ﻿@page
+@using System.Security.Claims;
 @model IndexModel
+@inject IFileStore _fileStore
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div>
-    <h1 class="display-4">Welcome</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <button id="snap">Snap Photo</button>
-    <canvas id="canvas" width="640" height="480"></canvas>
-    <button id="btnSave">Save Photo</button>
-</div>
+    <div>
+        <h1 class="display-4">Welcome</h1>
+        @if (!string.IsNullOrWhiteSpace(User.FindFirst(ClaimTypes.NameIdentifier)?.Value))
+        {
+            <img src="\images\@User.FindFirst(ClaimTypes.NameIdentifier)?.Value\MyTimelapse.gif" />
+            <video id="video" width="640" height="480" autoplay></video>
+            <button id="snap">Snap Photo</button>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            <button id="btnSave">Save Photo</button>
+        }
+    </div>
 
 @section Scripts
 {
@@ -63,6 +69,7 @@
                     processData: false,
                     type: 'post',
                     success: function () {
+                        location.reload();
                         //alert('Uploaded by jQuery');
                     }
                 });
