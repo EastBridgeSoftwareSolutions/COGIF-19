@@ -12,7 +12,6 @@ using TimeLapseWebHost.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TimeLapseWebHost.Pages;
 
 namespace TimeLapseWebHost
 {
@@ -26,7 +25,6 @@ namespace TimeLapseWebHost
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -53,9 +51,9 @@ namespace TimeLapseWebHost
             services.AddRazorPages();
 
             services.AddScoped<IFileStore, FileStore>();
+            services.AddTransient<IVideoEngine, VideoEngine>(); //transient because this engine will host process.Start()
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
