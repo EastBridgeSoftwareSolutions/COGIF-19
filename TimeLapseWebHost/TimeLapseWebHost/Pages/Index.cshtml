@@ -1,9 +1,6 @@
 ﻿@page
-@using System.Security.Claims;
-@using Microsoft.AspNetCore.Hosting;
 @model IndexModel
 @inject IFileStore _fileStore
-@inject IWebHostEnvironment _env
 @{
     ViewData["Title"] = "Home page";
 }
@@ -11,15 +8,12 @@
 <div>
     <h1 class="display-4">Welcome</h1>
     @{
-        var nameIdentifier = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!string.IsNullOrWhiteSpace(nameIdentifier))
+        if (User.Identity.IsAuthenticated)
         {
-            var relativePath = @$"images\{nameIdentifier}\MyTimelapse.gif";
-            var absolutePath = System.IO.Path.Combine(_env.WebRootPath, relativePath);
             
-            if (System.IO.File.Exists(absolutePath))
+            if (_fileStore.UserHasGif(User))
             {
-                <img src="\@relativePath" />
+                <img src="@(_fileStore.GetRelativeGifPath(User))" />
             }
             
             <video id="video" width="640" height="480" autoplay></video>
