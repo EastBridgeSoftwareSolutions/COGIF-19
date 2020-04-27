@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-using System.Security.Principal;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace TimeLapseWebHost
@@ -9,7 +9,9 @@ namespace TimeLapseWebHost
     {
         Task Create(IFormFile uploadedFile, string id);
         List<string> GetAll(string id);
-        string GetUserFolder(string id);
         string GetFFMPEGFolder();
-            }
+        string GetRelativeGifPath(ClaimsPrincipal user);
+        string GetUserFolder(string id);
+        bool UserHasGif(ClaimsPrincipal user);
+    }
 }

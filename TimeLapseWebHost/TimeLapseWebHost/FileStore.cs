@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ namespace TimeLapseWebHost
     {
         private readonly IWebHostEnvironment _env;
         private readonly string imagesRoot = "Images";
+        private const string GifFileName = "MyTimelapse.gif";
 
         public FileStore(IWebHostEnvironment env)
         {
@@ -46,6 +48,20 @@ namespace TimeLapseWebHost
         public string GetFFMPEGFolder()
         {
             return Path.Combine(_env.ContentRootPath, "FFMPEG");
+        }
+
+        public string GetRelativeGifPath(ClaimsPrincipal user)
+        {
+            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Path.Combine("\\", imagesRoot, id, GifFileName);
+        }
+
+        public bool UserHasGif(ClaimsPrincipal user)
+        {
+            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userFolder = GetUserFolder(id);
+            var gifPath = Path.Combine(userFolder, GifFileName);
+            return File.Exists(gifPath);
         }
     }
 }

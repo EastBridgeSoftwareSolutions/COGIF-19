@@ -1,43 +1,31 @@
 ﻿@page
-@using System.Security.Claims;
 @model IndexModel
 @inject IFileStore _fileStore
 @{
     ViewData["Title"] = "Home page";
 }
 
-    <div>
-        <h1 class="display-4">Welcome</h1>
-        @if (!string.IsNullOrWhiteSpace(User.FindFirst(ClaimTypes.NameIdentifier)?.Value))
+<div>
+    <h1 class="display-4">Welcome</h1>
+    @{
+        if (User.Identity.IsAuthenticated)
         {
-            <img src="\images\@User.FindFirst(ClaimTypes.NameIdentifier)?.Value\MyTimelapse.gif" />
+            
+            if (_fileStore.UserHasGif(User))
+            {
+                <img src="@(_fileStore.GetRelativeGifPath(User))" />
+            }
+            
             <video id="video" width="640" height="480" autoplay></video>
             <button id="snap">Snap Photo</button>
             <canvas id="canvas" width="640" height="480"></canvas>
             <button id="btnSave">Save Photo</button>
         }
-    </div>
+    }
+</div>
 
 @section Scripts
 {
-    <script>
-        $(function () {
-            $('#submit').on('click', function (evt) {
-                evt.preventDefault();
-                $.ajax({
-                    url: '',
-                    data: new FormData(document.forms[0]),
-                    contentType: false,
-                    processData: false,
-                    type: 'post',
-                    success: function () {
-                        alert('Uploaded by jQuery');
-                    }
-                });
-            });
-        });
-    </script>
-
     <script>
         var video = document.getElementById('video');
 
@@ -58,21 +46,15 @@
             context.drawImage(video, 0, 0, 640, 480);
         });
 
-        $("#btnSave").click(function () {
+        document.getElementById("btnSave").addEventListener("click", function () {
             canvas.toBlob(function (blob) {
                 const formData = new FormData();
                 formData.append('UploadedFile', blob, 'UploadedFile.png');
-                $.ajax({
-                    url: '',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    type: 'post',
-                    success: function () {
-                        location.reload();
-                        //alert('Uploaded by jQuery');
-                    }
-                });
+
+                fetch('', {
+                    method: 'post',
+                    body: formData,
+                }).then(() => location.reload())
             });
         });
 
