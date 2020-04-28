@@ -34,3 +34,4 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
+    modifyOutputPath: true
