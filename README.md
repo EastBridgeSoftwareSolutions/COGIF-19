@@ -3,6 +3,7 @@ The COGIF-19 application is all about showing the impact the corona virus has in
 
 Getting Started
 Installation process
+
 Use secret storage
 dotnet user-secrets init (in project dir)
 dotnet user-secrets set "Authentication:Facebook:AppId" "<app-id>"
@@ -17,18 +18,3 @@ dotnet user-secrets set "Authentication:Microsoft:ClientSecret" "<client-secret>
 Software dependencies
 NetCore
 FFMPEG
-
-Latest releases
-API references
-
-Build and Test
-
-
-Contribute
-TODO: Explain how other users and developers can contribute to make your code better.
-
-If you want to learn more about creating good readme files then refer the following guidelines . You can also seek inspiration from the below readme files:
-
-ASP.NET Core 
-Visual Studio Code 
-Chakra Core 
