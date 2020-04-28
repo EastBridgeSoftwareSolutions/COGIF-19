@@ -13,5 +13,24 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build TimeLapseWebHost/TimeLapseWebHost/TimeLapseWebHost.csproj --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: 'TimeLapseWebHost/TimeLapseWebHost.csproj'
+    feedsToUse: 'select'
+    vstsFeed: '272083fb-59d0-4c3f-9ffb-3355c88311fb'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'TimeLapseWebHost/TimeLapseWebHost.csproj'
+  
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: 'TimeLapseWebHost/TimeLapseWebHost.csproj'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
