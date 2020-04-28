@@ -1,5 +1,5 @@
 Introduction
-The MyCoronaFace application is all about showing the impact corona has on a personal and fun level. Did you grow a beard or a moustache? Did you cut your hair yourself? Or let it grow? Share the result with the world and hopefully we make people smile!
+The COGIF-19 application is all about showing the impact the corona virus has in a personal way with a twist. Did you grow a beard or a moustache? Did you cut your hair yourself? Or let it grow? Share the result with the world and hopefully we make people smile!
 
 Getting Started
 Installation process
