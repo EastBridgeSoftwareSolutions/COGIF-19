@@ -12,6 +12,7 @@ using TimeLapseWebHost.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Azure;
 
 namespace TimeLapseWebHost
 {
@@ -52,6 +53,7 @@ namespace TimeLapseWebHost
 
             services.AddScoped<IFileStore, FileStore>();
             services.AddTransient<IVideoEngine, VideoEngine>(); //transient because this engine will host process.Start()
+            services.AddApplicationInsightsTelemetry();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
