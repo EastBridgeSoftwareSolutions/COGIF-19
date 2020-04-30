@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,7 +44,7 @@ namespace TimeLapseWebHost
 
         public string GetUserFolder(string id)
         {
-            return Path.Combine(_env.WebRootPath, imagesRoot, id);
+            return Path.Combine(_env.ContentRootPath, imagesRoot, id);
         }
 
         public string GetFFMPEGFolder()
@@ -63,5 +65,6 @@ namespace TimeLapseWebHost
             var gifPath = Path.Combine(userFolder, GifFileName);
             return File.Exists(gifPath);
         }
+
     }
 }
