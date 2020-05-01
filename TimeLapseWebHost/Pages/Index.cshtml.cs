@@ -50,7 +50,7 @@ namespace TimeLapseWebHost.Pages
                 throw new UnauthorizedAccessException();
             }
             //bewust niet awaiten? laat maar gaan
-            await _fileStore.Create(UploadedFile, id);
+            //await _fileStore.Create(UploadedFile, id);
             _videoEngine.Create(id);
 
             return RedirectToPage("/Index");
