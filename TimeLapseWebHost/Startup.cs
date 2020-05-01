@@ -58,6 +58,11 @@ namespace TimeLapseWebHost
             services.AddScoped<IFileStore, FileStore>();
             services.AddTransient<IVideoEngine, VideoEngine>(); //transient because this engine will host process.Start()
             services.AddApplicationInsightsTelemetry();
+
+            services.AddAzureClients(builder =>
+            {
+                builder.AddBlobServiceClient(Configuration["ConnectionStrings:StorageConnection"]);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
