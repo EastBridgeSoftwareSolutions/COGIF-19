@@ -21,6 +21,7 @@ namespace TimeLapseWebHost
         public Startup(IConfiguration configuration,IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
@@ -49,7 +50,14 @@ namespace TimeLapseWebHost
                     microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ClientId"];
                     microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
                 });
-            services.AddRazorPages();
+            var builder = services.AddRazorPages();
+
+#if DEBUG
+            if (Environment.IsDevelopment())
+            {
+                builder.AddRazorRuntimeCompilation();
+            }
+#endif
 
             services.AddScoped<IFileStore, FileStore>();
             services.AddTransient<IVideoEngine, VideoEngine>(); //transient because this engine will host process.Start()

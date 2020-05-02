@@ -17,9 +17,9 @@
             }
             
             <video id="video" width="640" height="480" autoplay></video>
-            <button id="snap">Snap Photo</button>
+            <button id="snap" class="btn btn-secondary">Snap Photo</button>
             <canvas id="canvas" width="640" height="480"></canvas>
-            <button id="btnSave">Save Photo</button>
+            <button id="btnSave" class="btn btn-primary" style="display:none;">Save Photo</button>
         }
     }
 </div>
@@ -27,7 +27,11 @@
 @section Scripts
 {
     <script>
-        var video = document.getElementById('video');
+        const video = document.getElementById('video'),
+            canvas = document.getElementById('canvas'),
+            context = canvas.getContext('2d'),
+            snap = document.getElementById("snap"),
+            save = document.getElementById("btnSave");
 
         // Get access to the camera!
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -38,15 +42,13 @@
             });
         }
 
-        // Elements for taking the snapshot
-        var canvas = document.getElementById('canvas');
-        var context = canvas.getContext('2d');
 
-        document.getElementById("snap").addEventListener("click", function () {
+        snap.addEventListener("click", function () {
             context.drawImage(video, 0, 0, 640, 480);
+            save.style.display = 'inline-block';
         });
 
-        document.getElementById("btnSave").addEventListener("click", function () {
+        save.addEventListener("click", function () {
             canvas.toBlob(function (blob) {
                 const formData = new FormData();
                 formData.append('UploadedFile', blob, 'UploadedFile.png');
