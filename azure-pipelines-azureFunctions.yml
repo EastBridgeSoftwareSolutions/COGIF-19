@@ -35,7 +35,7 @@ stages:
       inputs:
         command: 'build'
         projects: |
-          $(workingDirectory)/VideoEncoder/VideoEncoder.csproj
+          $(workingDirectory)/**/VideoEncoder.csproj
         arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
 
     - task: ArchiveFiles@2
