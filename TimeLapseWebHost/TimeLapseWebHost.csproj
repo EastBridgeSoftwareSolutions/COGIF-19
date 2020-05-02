@@ -6,6 +6,16 @@
     <ApplicationInsightsResourceId>/subscriptions/e82e78de-a3f0-43a6-8705-798057e0a8a8/resourcegroups/COGIF-19_RG/providers/microsoft.insights/components/COGIF-19</ApplicationInsightsResourceId>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <ResolveStaticWebAssetsInputsDependsOn>RemoveIdentityAssets</ResolveStaticWebAssetsInputsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="RemoveIdentityAssets">
+    <ItemGroup>
+      <StaticWebAsset Remove="@(StaticWebAsset)" Condition="%(SourceId) == 'Microsoft.AspNetCore.Identity.UI'" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <Content Include="FFMPEG\ffmpeg.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -30,14 +40,6 @@
     <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <ResolveStaticWebAssetsInputsDependsOn>RemoveIdentityAssets</ResolveStaticWebAssetsInputsDependsOn>
-  </PropertyGroup>
-
-  <Target Name="RemoveIdentityAssets">
-    <ItemGroup>
-      <StaticWebAsset Remove="@(StaticWebAsset)" Condition="%(SourceId) == 'Microsoft.AspNetCore.Identity.UI'" />
-    </ItemGroup>
-  </Target>
+ 
 
 </Project>
