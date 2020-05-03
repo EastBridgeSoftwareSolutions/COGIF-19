@@ -49,8 +49,12 @@ namespace TimeLapseWebHost
 
                 string json = JsonConvert.SerializeObject(dictionary);
                 var requestData = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await client.PostAsync(string.Format("http://localhost:7071/api/VideoEncoder?userid=3ad5b82c-150d-4da4-b10d-5c525ab4c4bc"), requestData);
+#if DEBUG
+                var baseUrl = "http://localhost:7071";
+#else
+                var baseUrl = "https://cogif19encoder.azurewebsites.net";
+#endif
+                var response = await client.PostAsync(string.Format("{0}/api/VideoEncoder?userid=3ad5b82c-150d-4da4-b10d-5c525ab4c4bc", baseUrl), requestData);
                 var result = await response.Content.ReadAsStringAsync();
 
                 return result;
