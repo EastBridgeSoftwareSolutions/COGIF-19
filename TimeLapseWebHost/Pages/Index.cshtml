@@ -5,60 +5,40 @@
     ViewData["Title"] = "Home page";
 }
 
-<div>
-    <h1 class="display-4">Welcome</h1>
-    @{
-        if (User.Identity.IsAuthenticated)
-        {
-            
-            if (_fileStore.UserHasGif(User))
+    <div>
+        <h1 class="display-4">Welcome</h1>
+
+        @{
+            if (User.Identity.IsAuthenticated)
             {
-                <img src="@(_fileStore.GetRelativeGifPath(User))" />
+                <div class="flex flex-row justify-between">
+                    @if (_fileStore.UserHasGif(User))
+                    {
+                        <article x-data="data()" x-init="initCamera" class="inline-block overflow-hidden rounded-lg shadow-lg">
+                            <img src="@(_fileStore.GetRelativeGifPath(User))" />
+                        </article>
+
+                        
+                    }
+
+                    <article x-data="data()" x-init="initCamera" class="inline-block overflow-hidden rounded-lg shadow-lg">
+
+                        <video x-ref="video" x-show="!snapped" x-bind:width="gif.width" x-bind:height="gif.height" autoplay></video>
+                        <canvas x-ref="canvas" x-show="snapped" x-bind:width="gif.width" x-bind:height="gif.height"></canvas>
+
+                        <footer class="flex flex-row-reverse items-center justify-between leading-none p-2 md:p-4">
+                            <button x-show="!snapped" @@click="snap" type="button" class="btn btn-secondary">Snap Photo</button>
+                            <button x-show="snapped" @@click="submit" type="button" class="btn btn-primary">Save Photo</button>
+                            <button x-show="snapped" @@click="cancel" type="button" class="btn btn-danger">Try again</button>
+                        </footer>
+
+                    </article>
+                </div>
             }
-            
-            <video id="video" width="640" height="480" autoplay></video>
-            <button id="snap" class="btn btn-secondary">Snap Photo</button>
-            <canvas id="canvas" width="640" height="480"></canvas>
-            <button id="btnSave" class="btn btn-primary" style="display:none;">Save Photo</button>
         }
-    }
-</div>
+    </div>
 
 @section Scripts
 {
-    <script>
-        const video = document.getElementById('video'),
-            canvas = document.getElementById('canvas'),
-            context = canvas.getContext('2d'),
-            snap = document.getElementById("snap"),
-            save = document.getElementById("btnSave");
-
-        // Get access to the camera!
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Not adding `{ audio: true }` since we only want video now
-            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-                video.srcObject = stream;
-                video.play();
-            });
-        }
-
-
-        snap.addEventListener("click", function () {
-            context.drawImage(video, 0, 0, 640, 480);
-            save.style.display = 'inline-block';
-        });
-
-        save.addEventListener("click", function () {
-            canvas.toBlob(function (blob) {
-                const formData = new FormData();
-                formData.append('UploadedFile', blob, 'UploadedFile.png');
-
-                fetch('', {
-                    method: 'post',
-                    body: formData,
-                }).then(() => location.reload())
-            });
-        });
-
-    </script>
+    <script src="~/js/index.js" asp-append-version="true"></script>
 }
