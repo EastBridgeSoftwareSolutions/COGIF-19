@@ -54,7 +54,7 @@ namespace TimeLapseWebHost
 #else
                 var baseUrl = "https://cogif19encoder.azurewebsites.net";
 #endif
-                var response = await client.PostAsync(string.Format("{0}/api/VideoEncoder?userid=3ad5b82c-150d-4da4-b10d-5c525ab4c4bc", baseUrl), requestData);
+                var response = await client.PostAsync(string.Format("{0}/api/VideoEncoder?code=65OlFmVuDVP4P/w5hY4xDDaaBT0PiraXdb7RmVSiblxZHXJ2C4IASQ==", baseUrl), requestData);
                 var result = await response.Content.ReadAsStringAsync();
 
                 return result;
