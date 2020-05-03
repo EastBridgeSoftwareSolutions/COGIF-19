@@ -31,7 +31,7 @@ namespace TimeLapseWebHost
         {
             
             var userBlobContainer = _blobStorage.GetContainer(id);
-            await userBlobContainer.CreateIfNotExistsAsync();
+            await userBlobContainer.CreateIfNotExistsAsync(Microsoft.WindowsAzure.Storage.Blob.BlobContainerPublicAccessType.Blob,null,null);
             var filename = DateTime.Now.Ticks + ".png";
             using (var stream = uploadedFile.OpenReadStream())
             {

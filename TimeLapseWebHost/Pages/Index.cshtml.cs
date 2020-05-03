@@ -19,6 +19,7 @@ namespace TimeLapseWebHost.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IFileStore _fileStore;
         private readonly IVideoEngine _videoEngine;
+        public string UserId { get; set; }
 
         public IndexModel(ILogger<IndexModel> logger, IFileStore fileStore, IVideoEngine videoEngine)
         {
@@ -29,7 +30,7 @@ namespace TimeLapseWebHost.Pages
 
         public void OnGet()
         {
-
+            UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         [BindProperty, Display(Name = "File")]
