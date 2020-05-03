@@ -5,6 +5,6 @@ namespace TimeLapseWebHost
 {
     public interface IVideoEngine
     {
-        void Create(string id);
+        Task Create(string id);
     }
 }

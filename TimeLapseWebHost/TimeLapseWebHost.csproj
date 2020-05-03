@@ -7,13 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Images\placeholder.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="FFMPEG\ffmpeg.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Remove="FFMPEG\**" />
+    <Compile Remove="Images\**" />
+    <Content Remove="FFMPEG\**" />
+    <Content Remove="Images\**" />
+    <EmbeddedResource Remove="FFMPEG\**" />
+    <EmbeddedResource Remove="Images\**" />
+    <None Remove="FFMPEG\**" />
+    <None Remove="Images\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,9 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Images\placeholder.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\COGIF-19.AzureStorage\COGIF-19.AzureStorage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

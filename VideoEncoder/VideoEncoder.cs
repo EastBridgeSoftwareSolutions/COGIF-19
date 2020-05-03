@@ -9,10 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.Azure;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 using System.Diagnostics;
+using COGIF_19.AzureStorage;
 
 namespace VideoEncoder
 {
@@ -36,55 +34,42 @@ namespace VideoEncoder
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-            CloudBlobContainer inputContainer = GetCloudBlobContainer("input");
-            await CopyToLocal(log, localInputDir, inputContainer);
+            string userid = data["userid"];
+            if (string.IsNullOrWhiteSpace(userid))
+            {
+                throw new ArgumentNullException("userid");
+            }
 
-            var args = string.Format("-y -framerate 5 -i {0}\\%05d.png {1}\\MyTimelapse.gif", localInputDir, localOutputDir);
-            var result = ExecuteFFMpeg(log, args, localInputDir, localOutputDir, executionContext);
+            var blobs = new BlobStorage();
+            var userContainer = blobs.GetContainer(userid);
 
-            CopyToCloud(localOutputDir, "MyTimelapse.gif");
+            await userContainer.CopyToLocal(localInputDir);
+            var tempWorkingFolder = SetTempWorkingFolder(localInputDir);
+
+            var args = string.Format("-y -framerate 5 -i {0}\\%05d.png {1}\\MyTimelapse.gif", tempWorkingFolder, localOutputDir);
+            ExecuteFFMpeg(log, args, tempWorkingFolder, localOutputDir, executionContext);
+
+            await userContainer.CopyToCloud(localOutputDir, "MyTimelapse.gif");
+            RemoveTempWorkingFolder(localInputDir);
 
             return new OkResult();
         }
 
-        private static void CopyToCloud(string localOutputDir, string filename)
+        private static void RemoveTempWorkingFolder(string filePath)
         {
-            CloudBlobContainer outputContainer = GetCloudBlobContainer("output");
-            CloudBlockBlob outputBlob = outputContainer.GetBlockBlobReference(filename);
-
-            using (var fileStream = File.OpenRead(Path.Combine(localOutputDir, filename)))
-            {
-                outputBlob.UploadFromStreamAsync(fileStream).Wait();
-            }
+            Directory.Delete(Path.Combine(filePath, "TEMP"), true);
         }
 
-        private static async Task CopyToLocal(ILogger log, string inputDir, CloudBlobContainer blobContainer)
+        private static string SetTempWorkingFolder(string filePath)
         {
-            foreach (var item in blobContainer.ListBlobsSegmentedAsync(null).Result.Results)
+            var tempPath = Path.Combine(filePath, "TEMP");
+            Directory.CreateDirectory(tempPath);
+            var files = Directory.GetFiles(filePath, "*.png");
+            for (int i = 0; i < files.Length; i++)
             {
-                var blob = (CloudBlockBlob)item;
-                var filepath = Path.Combine(inputDir, blob.Name);
-                using (FileStream fs = File.Create(filepath))
-                {
-                    try
-                    {
-                        await blob.DownloadToStreamAsync(fs);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogError("There was a problem downloading input file from blob. " + ex.ToString());
-                    }
-                }
+                File.Copy(files[i], Path.Combine(tempPath, i.ToString("00000") + ".png"));
             }
-        }
-
-        private static CloudBlobContainer GetCloudBlobContainer(string containerName)
-        {
-            CloudStorageAccount storageAccount =
-                CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=cogif19;AccountKey=h5Wjo0DFfcumYLxa0qBKeIEj7Pe1ZrSytL8DXi7KQp71ViWfWyIt3opsacMWL1lXlEo+ix1Y8A/wVO6zZxtMgw==;EndpointSuffix=core.windows.net");
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-            return container;
+            return Path.Combine(tempPath);
         }
 
         private static string ExecuteFFMpeg(ILogger log, string ffmpegArguments, string pathLocalInput, string pathLocalOutput, ExecutionContext executionContext)

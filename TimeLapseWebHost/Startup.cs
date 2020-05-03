@@ -16,6 +16,7 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using COGIF_19.AzureStorage;
 
 namespace TimeLapseWebHost
 {
@@ -56,6 +57,7 @@ namespace TimeLapseWebHost
             services.AddRazorPages();
 
             services.AddScoped<IFileStore, FileStore>();
+            services.AddScoped<IBlobStorage, BlobStorage>();
             services.AddTransient<IVideoEngine, VideoEngine>(); //transient because this engine will host process.Start()
             services.AddApplicationInsightsTelemetry();
         }
@@ -76,11 +78,6 @@ namespace TimeLapseWebHost
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, @"Images")),
-                RequestPath = new PathString("/Images")
-            });
 
             app.UseRouting();
 

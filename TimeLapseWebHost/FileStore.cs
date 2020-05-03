@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using COGIF_19.AzureStorage;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
@@ -16,23 +17,26 @@ namespace TimeLapseWebHost
     public class FileStore : IFileStore
     {
         private readonly IWebHostEnvironment _env;
+        private readonly IBlobStorage _blobStorage;
         private readonly string imagesRoot = "Images";
         private const string GifFileName = "MyTimelapse.gif";
 
-        public FileStore(IWebHostEnvironment env)
+        public FileStore(IWebHostEnvironment env, IBlobStorage blobStorage)
         {
             _env = env ?? throw new ArgumentNullException(nameof(env));
+            _blobStorage = blobStorage;
         }
 
         public async Task Create(IFormFile uploadedFile, string id)
         {
-            string userpath = GetUserFolder(id);
+            
+            var userBlobContainer = _blobStorage.GetContainer(id);
+            await userBlobContainer.CreateIfNotExistsAsync();
+            Directory.CreateDirectory(id);
             var filename = DateTime.Now.Ticks + ".png";
-            var filePath = Path.Combine(userpath, filename);
-            Directory.CreateDirectory(userpath);
-            using (var stream = File.Create(filePath))
+            using (var stream = uploadedFile.OpenReadStream())
             {
-                await uploadedFile.CopyToAsync(stream);
+                await userBlobContainer.CopyToCloud(stream,filename);
             }
         }
 

@@ -1,6 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace TimeLapseWebHost
 {
@@ -13,68 +19,46 @@ namespace TimeLapseWebHost
             _fileStore = fileStore;
         }
 
-        public void Create(string id)
+        public async Task Create(string id)
         {
             var filePath = _fileStore.GetUserFolder(id);
-            string frameRate = "5";
-
-            var outputPngs = SetTempWorkingFolder(filePath);
-            var finalPath = Path.Combine(filePath, "MyTimelapse.gif");
-            var argumentsGif = string.Format("-y -framerate {0} -i {1} {2}", frameRate, outputPngs, finalPath);
-
+            //string frameRate = "5";
             try
             {
-                Execute("ffmpeg.exe", _fileStore.GetFFMPEGFolder(), argumentsGif);
+                var result = await Run(id);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
                 throw;
             }
-            finally
-            {
-                RemoveTempWorkingFolder(filePath);
-            }
-
-            
         }
-
-        private void RemoveTempWorkingFolder(string filePath)
+        public static async Task<HttpResponseMessage> Run( string userid)
         {
-            Directory.Delete(Path.Combine(filePath, "TEMP"), true);
+            var resuts = await PostRequest(userid);
+
+            return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
-        private string SetTempWorkingFolder(string filePath)
+        public static async Task<string> PostRequest(string text)
         {
-            var tempPath = Path.Combine(filePath, "TEMP");
-            Directory.CreateDirectory(tempPath);
-            var files = Directory.GetFiles(filePath, "*.png");
-            for (int i = 0; i < files.Length; i++)
+            using (var client = new HttpClient())
             {
-                File.Copy(files[i], Path.Combine(tempPath, i.ToString("00000") + ".png"));
+
+                Dictionary<string, string> dictionary = new Dictionary<string, string>();
+                dictionary.Add("userid", text);
+
+                string json = JsonConvert.SerializeObject(dictionary);
+                var requestData = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(string.Format("http://localhost:7071/api/VideoEncoder?userid=3ad5b82c-150d-4da4-b10d-5c525ab4c4bc"), requestData);
+                var result = await response.Content.ReadAsStringAsync();
+
+                return result;
             }
-            return Path.Combine(tempPath,"%05d.png");
         }
 
-        private static string Execute(string exeName, string exePath, string parameters)
-        {
-            string result = string.Empty;
 
-            using (Process p = new Process())
-            {
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.FileName = Path.Combine(exePath, exeName);
-                p.StartInfo.WorkingDirectory = exePath;
-                p.StartInfo.Arguments = parameters;
-                p.Start();
-                p.WaitForExit();
 
-                result = p.StandardOutput.ReadToEnd();
-            }
 
-            return result;
-        }
     }
 }
