@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - COGIF-19</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
     <link href="https://unpkg.com/tailwindcss@@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <header>
         <div class="bg-white shadow">
-            <nav class="container py-4 font-sans text-center flex flex-col sm:flex-row sm:text-left sm:justify-between sm:items-baseline w-full ">
+            <nav class="container mx-auto py-4 font-sans text-center flex flex-col sm:flex-row sm:text-left sm:justify-between sm:items-baseline w-full ">
                 <div>
                     <a asp-area="" asp-page="/Index" class="text-2xl no-underline text-grey-darkest hover:text-blue-dark">COGIF-19</a>
                     <a asp-area="" asp-page="/Index" class="text-lg no-underline text-grey-darkest hover:text-blue-dark ml-2">Home</a>
@@ -21,7 +21,7 @@
             </nav>
         </div>
     </header>
-    <div class="container">
+    <div class="container mx-auto">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

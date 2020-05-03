@@ -11,17 +11,12 @@
         @{
             if (User.Identity.IsAuthenticated)
             {
-                <div class="flex flex-row justify-between">
-                    @if (_fileStore.UserHasGif(User))
-                    {
-                        <article x-data="data()" x-init="initCamera" class="inline-block overflow-hidden rounded-lg shadow-lg">
-                            <img src="@(_fileStore.GetRelativeGifPath(User))" />
-                        </article>
+                <div x-data="data()" x-init="initCamera" class="flex flex-row flex-wrap justify-between">
+                    <article x-show="gif.exists" class="inline-block overflow-hidden rounded-lg shadow-lg mb-6">
+                        <img x-bind:src="gif.path" />
+                    </article>
 
-                        
-                    }
-
-                    <article x-data="data()" x-init="initCamera" class="inline-block overflow-hidden rounded-lg shadow-lg">
+                    <article class="inline-block overflow-hidden rounded-lg shadow-lg mb-6">
 
                         <video x-ref="video" x-show="!snapped" x-bind:width="gif.width" x-bind:height="gif.height" autoplay></video>
                         <canvas x-ref="canvas" x-show="snapped" x-bind:width="gif.width" x-bind:height="gif.height"></canvas>
@@ -40,5 +35,48 @@
 
 @section Scripts
 {
-    <script src="~/js/index.js" asp-append-version="true"></script>
+    <script>
+        const data = () => ({
+            gif: {
+                exists: @Json.Serialize(_fileStore.UserHasGif(User)),
+                path: @Json.Serialize(_fileStore.GetRelativeGifPath(User)),
+                width: 640,
+                height: 480
+            },
+            snapped: false,
+            snap() {
+                const self = this;
+                this.snapped = true;
+                this.$nextTick(() => {
+                    const { width, height } = self.gif;
+                    self.$refs.canvas.getContext('2d').drawImage(self.$refs.video, 0, 0, width, height);
+                });
+            },
+            submit() {
+                this.$refs.canvas.toBlob(function (blob) {
+                    const formData = new FormData();
+                    formData.append('UploadedFile', blob, 'UploadedFile.png');
+
+                    fetch('', {
+                        method: 'post',
+                        body: formData,
+                    }).then(() => location.reload())
+                });
+            },
+            cancel() {
+                this.snapped = false;
+            },
+            initCamera() {
+                const video = this.$refs.video;
+                // Get access to the camera!
+                if (video && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    // Not adding `{ audio: true }` since we only want video now
+                    navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                    });
+                }
+            }
+        });
+    </script>
 }
