@@ -32,7 +32,6 @@ namespace TimeLapseWebHost
             
             var userBlobContainer = _blobStorage.GetContainer(id);
             await userBlobContainer.CreateIfNotExistsAsync();
-            Directory.CreateDirectory(id);
             var filename = DateTime.Now.Ticks + ".png";
             using (var stream = uploadedFile.OpenReadStream())
             {
