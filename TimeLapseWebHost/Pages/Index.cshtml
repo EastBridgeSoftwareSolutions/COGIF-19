@@ -11,10 +11,10 @@
         if (User.Identity.IsAuthenticated)
         {
 
-            //if (_fileStore.UserHasGif(User))
-            //{
+            if (await _fileStore.UserHasGif(User))
+            {
                 <img src=@(string.Format("https://cogif19.blob.core.windows.net/{0}/MyTimelapse.gif",Model.UserId)) />
-            //}
+        }
 
             <video id="video" class="video" width="640" height="480" autoplay></video>
             <button id="snap">Snap Photo</button>

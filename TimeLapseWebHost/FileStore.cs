@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
+using Microsoft.WindowsAzure.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -39,34 +41,24 @@ namespace TimeLapseWebHost
             }
         }
 
-        public List<string> GetAll(string id)
-        {
-            string userpath = GetUserFolder(id);
-            return Directory.GetFiles(userpath).ToList();
-        }
-
-        public string GetUserFolder(string id)
-        {
-            return Path.Combine(_env.ContentRootPath, imagesRoot, id);
-        }
-
-        public string GetFFMPEGFolder()
-        {
-            return Path.Combine(_env.ContentRootPath, "FFMPEG");
-        }
-
-        public string GetRelativeGifPath(ClaimsPrincipal user)
+        public async Task<bool> UserHasGif(ClaimsPrincipal user)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Path.Combine("\\", imagesRoot, id, GifFileName);
-        }
+            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference("MyTimelapse.gif");
+            try
+            {
+                await userBlobContainer.FetchAttributesAsync();
+                return true;
+            }
+            catch (StorageException e)
+            {
+                if (e.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
+                {
+                    return false;
+                }
 
-        public bool UserHasGif(ClaimsPrincipal user)
-        {
-            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userFolder = GetUserFolder(id);
-            var gifPath = Path.Combine(userFolder, GifFileName);
-            return File.Exists(gifPath);
+            }
+            return false;
         }
 
     }

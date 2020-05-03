@@ -21,22 +21,8 @@ namespace TimeLapseWebHost
 
         public async Task Create(string id)
         {
-            var filePath = _fileStore.GetUserFolder(id);
             //string frameRate = "5";
-            try
-            {
-                var result = await Run(id);
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-        }
-        public static async Task<HttpResponseMessage> Run( string userid)
-        {
-            var resuts = await PostRequest(userid);
-
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            await PostRequest(id);
         }
 
         public static async Task<string> PostRequest(string text)
