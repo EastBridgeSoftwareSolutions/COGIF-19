@@ -53,15 +53,23 @@ namespace TimeLapseWebHost
         public string GetRelativeGifPath(ClaimsPrincipal user)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Path.Combine("\\", imagesRoot, id, GifFileName);
+            var gifPath = GetServerGifPath(user);
+            var changedAt = File.GetLastWriteTime(gifPath);
+
+            return Path.Combine("\\", imagesRoot, id, GifFileName + "?" + changedAt.ToString("yyyymmddss", System.Globalization.CultureInfo.InvariantCulture));
         }
 
         public bool UserHasGif(ClaimsPrincipal user)
         {
+            var gifPath = GetServerGifPath(user);
+            return File.Exists(gifPath);
+        }
+
+        private string GetServerGifPath(ClaimsPrincipal user)
+        {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userFolder = GetUserFolder(id);
-            var gifPath = Path.Combine(userFolder, GifFileName);
-            return File.Exists(gifPath);
+            return Path.Combine(userFolder, GifFileName);
         }
     }
 }
