@@ -6,14 +6,13 @@ namespace COGIF_19.AzureStorage
 {
     public class BlobStorage : IBlobStorage
     {
-        CloudBlobClient blobClient;
+        readonly CloudBlobClient blobClient;
 
-        public BlobStorage()
+        public BlobStorage(string connectionstring)
         {
             var storageAccount =
-                CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=cogif19;AccountKey=h5Wjo0DFfcumYLxa0qBKeIEj7Pe1ZrSytL8DXi7KQp71ViWfWyIt3opsacMWL1lXlEo+ix1Y8A/wVO6zZxtMgw==;EndpointSuffix=core.windows.net");
+                CloudStorageAccount.Parse(connectionstring);
             blobClient = storageAccount.CreateCloudBlobClient();
-
         }
 
         public CloudBlobContainer GetContainer(string containerName)

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +13,12 @@ namespace TimeLapseWebHost
 {
     public class VideoEngine : IVideoEngine
     {
+        private readonly IConfiguration _configuration;
         private readonly IFileStore _fileStore;
 
-        public VideoEngine(IFileStore fileStore)
+        public VideoEngine(IConfiguration configuration, IFileStore fileStore)
         {
+            _configuration = configuration;
             _fileStore = fileStore;
         }
 
@@ -25,7 +28,7 @@ namespace TimeLapseWebHost
             await PostRequest(id);
         }
 
-        public static async Task<string> PostRequest(string text)
+        public async Task<string> PostRequest(string text)
         {
             using (var client = new HttpClient())
             {
@@ -40,7 +43,7 @@ namespace TimeLapseWebHost
 #else
                 var baseUrl = "https://cogif19encoder.azurewebsites.net";
 #endif
-                var response = await client.PostAsync(string.Format("{0}/api/VideoEncoder?code=65OlFmVuDVP4P/w5hY4xDDaaBT0PiraXdb7RmVSiblxZHXJ2C4IASQ==", baseUrl), requestData);
+                var response = await client.PostAsync($"{baseUrl}/api/VideoEncoder?code={_configuration["AzureFunction:VideoEncoder:Secret"]}", requestData);
                 var result = await response.Content.ReadAsStringAsync();
 
                 return result;

@@ -11,6 +11,10 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage;
 using System.Diagnostics;
 using COGIF_19.AzureStorage;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 
 namespace VideoEncoder
 {
@@ -22,6 +26,17 @@ namespace VideoEncoder
             ILogger log, ExecutionContext executionContext)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(
+                new KeyVaultClient.AuthenticationCallback(
+                    azureServiceTokenProvider.KeyVaultTokenCallback));
+
+            var config = new ConfigurationBuilder()
+            .SetBasePath(executionContext.FunctionAppDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddAzureKeyVault("https://cogif-19-dev.vault.azure.net", keyVaultClient, new DefaultKeyVaultSecretManager())
+            .Build();
 
             var localInputDir = Path.Combine(Path.GetTempPath(), "input");
             var localOutputDir = Path.Combine(Path.GetTempPath(), "output");
@@ -40,7 +55,7 @@ namespace VideoEncoder
                 throw new ArgumentNullException("userid");
             }
 
-            var blobs = new BlobStorage();
+            var blobs = new BlobStorage(config["ConnectionStrings:StorageConnection"]);
             var userContainer = blobs.GetContainer(userid);
 
             await userContainer.CopyToLocal(localInputDir);
@@ -76,7 +91,7 @@ namespace VideoEncoder
         {
             string output = string.Empty;
             log.LogInformation("Encoding...");
-            var file = Path.Combine(executionContext.FunctionAppDirectory, "ffmpeg","ffmpeg.exe");
+            var file = Path.Combine(executionContext.FunctionAppDirectory, "ffmpeg", "ffmpeg.exe");
 
             var process = new Process();
             process.StartInfo.FileName = file;

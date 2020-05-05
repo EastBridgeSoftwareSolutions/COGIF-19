@@ -57,9 +57,14 @@ namespace TimeLapseWebHost
             services.AddRazorPages();
 
             services.AddScoped<IFileStore, FileStore>();
-            services.AddScoped<IBlobStorage, BlobStorage>();
-            services.AddTransient<IVideoEngine, VideoEngine>(); //transient because this engine will host process.Start()
+            services.AddScoped<IBlobStorage>(bs=> new BlobStorage(Configuration["ConnectionStrings:StorageConnection"]));
+            services.AddScoped<IVideoEngine, VideoEngine>(); //nog wegrefactoren
             services.AddApplicationInsightsTelemetry();
+
+            services.AddAzureClients(builder =>
+            {
+                builder.AddBlobServiceClient(Configuration["ConnectionStrings:StorageConnection"]);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
