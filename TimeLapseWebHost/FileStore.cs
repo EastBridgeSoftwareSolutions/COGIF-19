@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +21,6 @@ namespace TimeLapseWebHost
     {
         private readonly IWebHostEnvironment _env;
         private readonly IBlobStorage _blobStorage;
-        private readonly string imagesRoot = "Images";
         private const string GifFileName = "MyTimelapse.gif";
 
         public FileStore(IWebHostEnvironment env, IBlobStorage blobStorage)
@@ -31,20 +31,20 @@ namespace TimeLapseWebHost
 
         public async Task Create(IFormFile uploadedFile, string id)
         {
-            
+
             var userBlobContainer = _blobStorage.GetContainer(id);
-            await userBlobContainer.CreateIfNotExistsAsync(Microsoft.WindowsAzure.Storage.Blob.BlobContainerPublicAccessType.Blob,null,null);
+            await userBlobContainer.CreateIfNotExistsAsync(Microsoft.WindowsAzure.Storage.Blob.BlobContainerPublicAccessType.Off,null,null);
             var filename = DateTime.Now.Ticks + ".png";
             using (var stream = uploadedFile.OpenReadStream())
             {
-                await userBlobContainer.CopyToCloud(stream,filename);
+                await userBlobContainer.CopyToCloud(stream, filename);
             }
         }
 
         public async Task<bool> UserHasGif(ClaimsPrincipal user)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference("MyTimelapse.gif");
+            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(GifFileName);
             try
             {
                 await userBlobContainer.FetchAttributesAsync();
@@ -59,6 +59,23 @@ namespace TimeLapseWebHost
 
             }
             return false;
+        }
+
+        public Uri GetResourceWithSas(ClaimsPrincipal user, string resourceId)
+        {
+            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(resourceId);
+            var sasPolicy = new SharedAccessBlobPolicy()
+            {
+                Permissions = SharedAccessBlobPermissions.Read,
+                SharedAccessStartTime = DateTime.Now.AddMinutes(-10),
+                SharedAccessExpiryTime = DateTime.Now.AddMinutes(30)
+            };
+
+            string sasToken = userBlobContainer.GetSharedAccessSignature(sasPolicy);
+            var baseUrl = "https://cogif19.blob.core.windows.net";
+
+            return new Uri($"{baseUrl}/{id}/{resourceId}{sasToken}");
         }
 
     }
