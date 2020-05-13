@@ -9,7 +9,6 @@ namespace TimeLapseWebHost
     public interface IFileStore
     {
         Task Create(IFormFile uploadedFile, string id);
-        Task<bool> UserHasGif(ClaimsPrincipal user);
-        Uri GetResourceWithSas(ClaimsPrincipal user, string resourceId);
+        Task<(bool, Uri)> UserHasGif(ClaimsPrincipal user);
     }
 }

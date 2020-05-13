@@ -40,17 +40,15 @@ namespace TimeLapseWebHost
             }
         }
 
-        public Task<bool> UserHasGif(ClaimsPrincipal user)
+        public async Task<(bool, Uri)> UserHasGif(ClaimsPrincipal user)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(GifFileName);
-            return userBlobContainer.ExistsAsync();
-        }
+            if (await userBlobContainer.ExistsAsync())
+            {
+                return (false, null);
+            }
 
-        public Uri GetResourceWithSas(ClaimsPrincipal user, string resourceId)
-        {
-            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(resourceId);
             //todo? DI?
             var sasPolicy = new SharedAccessBlobPolicy()
             {
@@ -60,7 +58,8 @@ namespace TimeLapseWebHost
             };
 
             string sasToken = userBlobContainer.GetSharedAccessSignature(sasPolicy);
-            return new Uri($"{userBlobContainer.Uri}{sasToken}");
+            return (true, new Uri($"{userBlobContainer.Uri}{sasToken}"));
+
         }
 
     }

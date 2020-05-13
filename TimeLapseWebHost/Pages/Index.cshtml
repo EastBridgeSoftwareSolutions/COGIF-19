@@ -3,6 +3,7 @@
 @inject IFileStore _fileStore
 @{
     ViewData["Title"] = "Home page";
+    var userHasGif = _fileStore.UserHasGif(User);
 }
 
 <div>
@@ -11,9 +12,9 @@
         if (User.Identity.IsAuthenticated)
         {
 
-            if (await _fileStore.UserHasGif(User))
+            if (userHasGif.Result.Item1)
             {
-                <img src=@_fileStore.GetResourceWithSas(User,"MyTimelapse.gif").AbsoluteUri ) />
+                <img src=@userHasGif.Result.Item2.AbsoluteUri ) />
             }
 
             <video id="video" class="video" width="640" height="480" autoplay></video>
