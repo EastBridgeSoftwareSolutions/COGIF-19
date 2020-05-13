@@ -1,80 +1,57 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace TimeLapseWebHost
 {
     public class VideoEngine : IVideoEngine
     {
+        private readonly IConfiguration _configuration;
         private readonly IFileStore _fileStore;
 
-        public VideoEngine(IFileStore fileStore)
+        public VideoEngine(IConfiguration configuration, IFileStore fileStore)
         {
+            _configuration = configuration;
             _fileStore = fileStore;
         }
 
-        public void Create(string id)
+        public async Task Create(string id)
         {
-            var filePath = _fileStore.GetUserFolder(id);
-            string frameRate = "5";
-
-            var outputPngs = SetTempWorkingFolder(filePath);
-            var finalPath = Path.Combine(filePath, "MyTimelapse.gif");
-            var argumentsGif = string.Format("-y -framerate {0} -i {1} {2}", frameRate, outputPngs, finalPath);
-
-            try
-            {
-                Execute("ffmpeg.exe", _fileStore.GetFFMPEGFolder(), argumentsGif);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-            finally
-            {
-                RemoveTempWorkingFolder(filePath);
-            }
-
-            
+            //string frameRate = "5";
+            await PostRequest(id);
         }
 
-        private void RemoveTempWorkingFolder(string filePath)
+        public async Task<string> PostRequest(string text)
         {
-            Directory.Delete(Path.Combine(filePath, "TEMP"), true);
-        }
-
-        private string SetTempWorkingFolder(string filePath)
-        {
-            var tempPath = Path.Combine(filePath, "TEMP");
-            Directory.CreateDirectory(tempPath);
-            var files = Directory.GetFiles(filePath, "*.png");
-            for (int i = 0; i < files.Length; i++)
+            using (var client = new HttpClient())
             {
-                File.Copy(files[i], Path.Combine(tempPath, i.ToString("00000") + ".png"));
+
+                Dictionary<string, string> dictionary = new Dictionary<string, string>();
+                dictionary.Add("userid", text);
+
+                string json = JsonConvert.SerializeObject(dictionary);
+                var requestData = new StringContent(json, Encoding.UTF8, "application/json");
+#if DEBUG
+                var baseUrl = "http://localhost:7071";
+#else
+                var baseUrl = "https://cogif19encoder.azurewebsites.net";
+#endif
+                var response = await client.PostAsync($"{baseUrl}/api/VideoEncoder?code={_configuration["AzureFunction:VideoEncoder:Secret"]}", requestData);
+                var result = await response.Content.ReadAsStringAsync();
+
+                return result;
             }
-            return Path.Combine(tempPath,"%05d.png");
         }
 
-        private static string Execute(string exeName, string exePath, string parameters)
-        {
-            string result = string.Empty;
 
-            using (Process p = new Process())
-            {
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.FileName = Path.Combine(exePath, exeName);
-                p.StartInfo.WorkingDirectory = exePath;
-                p.StartInfo.Arguments = parameters;
-                p.Start();
-                p.WaitForExit();
 
-                result = p.StandardOutput.ReadToEnd();
-            }
 
-            return result;
-        }
     }
 }

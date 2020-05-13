@@ -10,13 +10,13 @@
     @{
         if (User.Identity.IsAuthenticated)
         {
-            
-            if (_fileStore.UserHasGif(User))
+
+            if (await _fileStore.UserHasGif(User))
             {
-                <img src="@(_fileStore.GetRelativeGifPath(User))" />
+                <img src=@_fileStore.GetResourceWithSas(User,"MyTimelapse.gif").AbsoluteUri ) />
             }
-            
-            <video id="video" width="640" height="480" autoplay></video>
+
+            <video id="video" class="video" width="640" height="480" autoplay></video>
             <button id="snap">Snap Photo</button>
             <canvas id="canvas" width="640" height="480"></canvas>
             <button id="btnSave">Save Photo</button>

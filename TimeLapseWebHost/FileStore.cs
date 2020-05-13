@@ -1,10 +1,17 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using COGIF_19.AzureStorage;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Primitives;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -13,55 +20,48 @@ namespace TimeLapseWebHost
 {
     public class FileStore : IFileStore
     {
-        private readonly IWebHostEnvironment _env;
-        private readonly string imagesRoot = "Images";
+        private readonly IBlobStorage _blobStorage;
         private const string GifFileName = "MyTimelapse.gif";
 
-        public FileStore(IWebHostEnvironment env)
+        public FileStore(IConfiguration env, IBlobStorage blobStorage)
         {
-            _env = env ?? throw new ArgumentNullException(nameof(env));
+            _blobStorage = blobStorage;
         }
 
         public async Task Create(IFormFile uploadedFile, string id)
         {
-            string userpath = GetUserFolder(id);
+
+            var userBlobContainer = _blobStorage.GetContainer(id);
+            await userBlobContainer.CreateIfNotExistsAsync(BlobContainerPublicAccessType.Off, null, null);
             var filename = DateTime.Now.Ticks + ".png";
-            var filePath = Path.Combine(userpath, filename);
-            Directory.CreateDirectory(userpath);
-            using (var stream = File.Create(filePath))
+            using (var stream = uploadedFile.OpenReadStream())
             {
-                await uploadedFile.CopyToAsync(stream);
+                await userBlobContainer.CopyToCloud(stream, filename);
             }
         }
 
-        public List<string> GetAll(string id)
-        {
-            string userpath = GetUserFolder(id);
-            return Directory.GetFiles(userpath).ToList();
-        }
-
-        public string GetUserFolder(string id)
-        {
-            return Path.Combine(_env.WebRootPath, imagesRoot, id);
-        }
-
-        public string GetFFMPEGFolder()
-        {
-            return Path.Combine(_env.ContentRootPath, "FFMPEG");
-        }
-
-        public string GetRelativeGifPath(ClaimsPrincipal user)
+        public Task<bool> UserHasGif(ClaimsPrincipal user)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Path.Combine("\\", imagesRoot, id, GifFileName);
+            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(GifFileName);
+            return userBlobContainer.ExistsAsync();
         }
 
-        public bool UserHasGif(ClaimsPrincipal user)
+        public Uri GetResourceWithSas(ClaimsPrincipal user, string resourceId)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userFolder = GetUserFolder(id);
-            var gifPath = Path.Combine(userFolder, GifFileName);
-            return File.Exists(gifPath);
+            var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(resourceId);
+            //todo? DI?
+            var sasPolicy = new SharedAccessBlobPolicy()
+            {
+                Permissions = SharedAccessBlobPermissions.Read,
+                SharedAccessStartTime = DateTime.Now.AddMinutes(-10),
+                SharedAccessExpiryTime = DateTime.Now.AddMinutes(30)
+            };
+
+            string sasToken = userBlobContainer.GetSharedAccessSignature(sasPolicy);
+            return new Uri($"{userBlobContainer.Uri}{sasToken}");
         }
+
     }
 }

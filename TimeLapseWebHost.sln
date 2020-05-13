@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeLapseWebHost", "TimeLapseWebHost\TimeLapseWebHost.csproj", "{ED0A08A1-1546-4402-8077-010D0DD8AD7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeLapseWebHost", "TimeLapseWebHost\TimeLapseWebHost.csproj", "{ED0A08A1-1546-4402-8077-010D0DD8AD7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoEncoder", "VideoEncoder\VideoEncoder.csproj", "{26769CEF-D694-4585-AD69-9E2B0A685EAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COGIF-19.AzureStorage", "COGIF-19.AzureStorage\COGIF-19.AzureStorage.csproj", "{A2E4CB0E-B947-486C-9352-AD73BC3E12DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{ED0A08A1-1546-4402-8077-010D0DD8AD7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED0A08A1-1546-4402-8077-010D0DD8AD7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED0A08A1-1546-4402-8077-010D0DD8AD7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26769CEF-D694-4585-AD69-9E2B0A685EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26769CEF-D694-4585-AD69-9E2B0A685EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26769CEF-D694-4585-AD69-9E2B0A685EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26769CEF-D694-4585-AD69-9E2B0A685EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2E4CB0E-B947-486C-9352-AD73BC3E12DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2E4CB0E-B947-486C-9352-AD73BC3E12DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2E4CB0E-B947-486C-9352-AD73BC3E12DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2E4CB0E-B947-486C-9352-AD73BC3E12DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
