@@ -44,7 +44,7 @@ namespace TimeLapseWebHost
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userBlobContainer = _blobStorage.GetContainer(id).GetBlobReference(GifFileName);
-            if (await userBlobContainer.ExistsAsync())
+            if (!await userBlobContainer.ExistsAsync())
             {
                 return (false, null);
             }
