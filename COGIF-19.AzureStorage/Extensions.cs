@@ -12,9 +12,10 @@ namespace COGIF_19.AzureStorage
     {
         public static async Task CopyToLocal(this CloudBlobContainer blobContainer, string localDir)
         {
-            foreach (var item in blobContainer.ListBlobsSegmentedAsync(null).Result.Results)
+            var blobSegments = await blobContainer.ListBlobsSegmentedAsync(null);
+            foreach (var segment in blobSegments.Results)
             {
-                var blob = (CloudBlockBlob)item;
+                var blob = (CloudBlockBlob)segment;
                 var filepath = Path.Combine(localDir, blob.Name);
                 using (FileStream fs = File.Create(filepath))
                 {
