@@ -47,6 +47,12 @@ namespace TimeLapseWebHost
             return userBlobContainer.ExistsAsync();
         }
 
+        public Task<bool> DeleteContainer(ClaimsPrincipal user)
+        {
+            var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return  _blobStorage.DeleteContainer(id);
+        }
+
         public Uri GetResourceWithSas(ClaimsPrincipal user, string resourceId)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;

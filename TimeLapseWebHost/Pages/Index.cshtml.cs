@@ -56,5 +56,20 @@ namespace TimeLapseWebHost.Pages
 
             return RedirectToPage("/Index");
         }
+
+        public async Task<IActionResult> OnDelete()
+        {
+            if (User == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+            var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new UnauthorizedAccessException();
+            }
+            var result = await _fileStore.DeleteContainer(User);
+            return new OkObjectResult(result);
+        }
     }
 }

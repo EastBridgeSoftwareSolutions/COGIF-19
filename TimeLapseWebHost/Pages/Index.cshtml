@@ -5,24 +5,26 @@
     ViewData["Title"] = "Home page";
 }
 
-<div>
-    <h1 class="display-4">Welcome</h1>
-    @{
-        if (User.Identity.IsAuthenticated)
-        {
-
-            if (await _fileStore.UserHasGif(User))
+    <div>
+        <h1 class="display-4">Welcome</h1>
+        @{
+            if (User.Identity.IsAuthenticated)
             {
-                <img src=@_fileStore.GetResourceWithSas(User,"MyTimelapse.gif").AbsoluteUri ) />
-            }
 
-            <video id="video" class="video" width="640" height="480" autoplay></video>
-            <button id="snap">Snap Photo</button>
-            <canvas id="canvas" width="640" height="480"></canvas>
-            <button id="btnSave">Save Photo</button>
+                if (await _fileStore.UserHasGif(User))
+                {
+                    <img src=@_fileStore.GetResourceWithSas(User,"MyTimelapse.gif").AbsoluteUri ) />
+                    <button id="btnClear">Start over</button>
+                }
+
+
+                <video id="video" class="video" width="640" height="480" autoplay></video>
+                <button id="snap">Snap Photo</button>
+                <canvas id="canvas" width="640" height="480"></canvas>
+                <button id="btnSave">Save Photo</button>
+            }
         }
-    }
-</div>
+    </div>
 
 @section Scripts
 {
@@ -56,6 +58,15 @@
                     body: formData,
                 }).then(() => location.reload())
             });
+        });
+
+        document.getElementById("btnClear").addEventListener("click", function () {
+            fetch('', {
+                method: 'delete'
+            }).then(() => {
+                alert('It may take some time to delete the files. Refresh if needed.');
+                location.reload();
+            })
         });
 
     </script>
