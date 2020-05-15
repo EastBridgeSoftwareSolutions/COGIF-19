@@ -6,6 +6,5 @@ namespace COGIF_19.AzureStorage
     public interface IBlobStorage
     {
         CloudBlobContainer GetContainer(string containerName);
-        Task<bool> DeleteContainer(string containerName);
     }
 }

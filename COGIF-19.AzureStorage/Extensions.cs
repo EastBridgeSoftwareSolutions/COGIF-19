@@ -24,6 +24,16 @@ namespace COGIF_19.AzureStorage
             }
         }
 
+        public static async Task DeleteFiles(this CloudBlobContainer blobContainer)
+        {
+            var blobSegments = await blobContainer.ListBlobsSegmentedAsync(null);
+            foreach (var segment in blobSegments.Results)
+            {
+                var blob = (CloudBlockBlob)segment;
+                _ = blob.DeleteAsync();
+            }
+        }
+
         public static async Task CopyToCloud(this CloudBlobContainer blobContainer, string localOutputDir, string filename)
         {
             var outputBlob = blobContainer.GetBlockBlobReference(filename);

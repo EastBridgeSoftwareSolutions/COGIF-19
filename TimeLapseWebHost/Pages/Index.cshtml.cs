@@ -68,8 +68,8 @@ namespace TimeLapseWebHost.Pages
             {
                 throw new UnauthorizedAccessException();
             }
-            var result = await _fileStore.DeleteContainer(User);
-            return new OkObjectResult(result);
+            await _fileStore.DeleteContainer(User);
+            return new OkResult();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace TimeLapseWebHost
     {
         Task Create(IFormFile uploadedFile, string id);
         Task<bool> UserHasGif(ClaimsPrincipal user);
-        Task<bool> DeleteContainer(ClaimsPrincipal user);
+        Task DeleteContainer(ClaimsPrincipal user);
         Uri GetResourceWithSas(ClaimsPrincipal user, string resourceId);
     }
 }

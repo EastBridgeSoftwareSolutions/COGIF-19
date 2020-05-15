@@ -16,12 +16,6 @@ namespace COGIF_19.AzureStorage
             blobClient = storageAccount.CreateCloudBlobClient();
         }
 
-        public Task<bool> DeleteContainer(string containerName)
-        {
-            CloudBlobContainer container = blobClient.GetContainerReference(containerName);
-            return container.DeleteIfExistsAsync(); ;
-        }
-
         public CloudBlobContainer GetContainer(string containerName)
         {
             CloudBlobContainer container = blobClient.GetContainerReference(containerName);
